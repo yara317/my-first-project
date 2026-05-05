@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Request</title>
+
+    <link rel="stylesheet" href="../css/student.css">
+</head>
+
+<body data-page="create-request">
+   
+
+    <div class="navbar">Create Request</div>
+    
+    <div class="container">
+    
+    <div class="sidebar">
+    <a href="dashboard.html">Dashboard</a>
+    <a class="active" href="create-request.html">Create</a>
+    <a href="track-request.html">Track</a>
+    <a href="profile.html">Profile</a>
+    <a href="request-details.html">Request-Details</a>
+    </div>
+    
+    <div class="content">
+    
+    <div class="card">
+    
+    <form>
+    
+    <label>Service (service_id)</label>
+    <select class="input" name="service_id"></select>
+    
+    <label>Details (REQUEST_DETAILS)</label>
+    <textarea class="input" name="field_value"></textarea>
+    
+    <label>Attachments (ATTACHMENT)</label>
+    <input type="file" multiple class="input">
+    
+    <button class="btn">Submit Request</button>
+    
+    </form>
+    
+    </div>
+    
+    </div>
+    </div>
+   
+    <script src="../js/student.js"></script>
+</html>

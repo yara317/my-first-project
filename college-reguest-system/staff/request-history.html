@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request History</title>
+    <link rel="stylesheet" href="../css/student.css">
+</head>
+
+<body>
+
+<header class="navbar">
+    <h2>Request History</h2>
+</header>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="request-list.html">Request List</a>
+        <a href="review-request.html">Review Request</a>
+        <a class="active" href="request-history.html">History</a>
+        <a href="profile.html">Profile</a>
+
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+
+        <div class="card">
+
+            <h3>All Actions Log</h3>
+
+            <table>
+
+                <tr>
+                    <th>Request ID</th>
+                    <th>Action By</th>
+                    <th>Action</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                </tr>
+
+                <tr>
+                    <td>REQ-001</td>
+                    <td>Staff A</td>
+                    <td><span class="status approved">Approved</span></td>
+                    <td>2026-05-01</td>
+                    <td>All documents valid</td>
+                </tr>
+
+                <tr>
+                    <td>REQ-002</td>
+                    <td>Staff B</td>
+                    <td><span class="status rejected">Rejected</span></td>
+                    <td>2026-05-01</td>
+                    <td>Missing certificate</td>
+                </tr>
+
+                <tr>
+                    <td>REQ-003</td>
+                    <td>Staff A</td>
+                    <td><span class="status approved">Approved</span></td>
+                    <td>2026-04-30</td>
+                    <td>OK</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

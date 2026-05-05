@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Request</title>
+    <link rel="stylesheet" href="../css/student.css">
+</head>
+
+<body>
+
+<header class="navbar">
+    <h2>Review Request</h2>
+</header>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="request-list.html">Request List</a>
+        <a class="active" href="review-request.html">Review Request</a>
+        <a href="request-history.html">History</a>
+        <a href="profile.html">Profile</a>
+
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+
+        <div class="card">
+
+            <h3>Request Details</h3>
+
+            <!-- Request Info -->
+            <div class="details-grid">
+
+                <div class="detail-item">
+                    <span>Request ID</span>
+                    <strong>REQ-001</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Student</span>
+                    <strong>Ali Ahmed</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Service</span>
+                    <strong>Transcript</strong>
+                </div>
+
+                <div class="detail-item full-width">
+                    <span>Status</span>
+                    <strong class="status pending">Pending</strong>
+                </div>
+
+            </div>
+
+            <br>
+
+            <!-- Action -->
+            <div class="form-group">
+
+                <label>Decision Comment (if reject)</label>
+                <textarea class="input" placeholder="Write reason..."></textarea>
+
+            </div>
+
+            <button class="btn" style="background: #27ae60;">Approve</button>
+            <button class="btn" style="background: #c0392b;">Reject</button>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
