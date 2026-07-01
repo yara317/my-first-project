@@ -1,0 +1,1014 @@
+{
+  "info": {
+    "_postman_id": "595cf7db-ecec-498b-be10-aeca23b2b9c7",
+    "name": "Collage API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55461255",
+    "_collection_link": "https://go.postman.co/collection/55461255-595cf7db-ecec-498b-be10-aeca23b2b9c7?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "services",
+      "item": [
+        {
+          "name": "Get All Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/services/get.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "services",
+                "get.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create service",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n   {\r\n    \"name\": \"نقل مماثل\",\r\n    \"description\": \"طلب انتقال الطالب من جامعة أو كلية أخرى إلى الكلية مع معادلة المواد التي درسها سابقاً.\"\r\n} \r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/services/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "services",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete service",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\"service_id\":1\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/services/delete.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "services",
+                "delete.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update service",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n    \"service_id\":3,\r\n    \"name\":\"تغيير قيد\",\r\n    \"description\": \"طلب الحصول على كشف علامات رسمي ومصدق من الكلية.\"\r\n}\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/services/update.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "services",
+                "update.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "students",
+      "item": [
+        {
+          "name": "student get",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/students/get.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "students",
+                "get.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "student create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"user_id\":3,\r\n    \"university_no\":\"21210201\",\r\n    \"study_year\":4\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/students/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "students",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "student delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n    \"student_id\":6\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/students/delete.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "students",
+                "delete.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "student update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"student_id\":6,\r\n    \"university_no\":\"20331001\",\r\n    \"study_year\":4\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/students/update.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "students",
+                "update.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "student complete",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"user_id\":2,\r\n  \"university_no\":\"UNI2124005\",\r\n  \"study_year\":5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/students/complete.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "students",
+                "complete.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "requests",
+      "item": [
+        {
+          "name": "Get All request",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/requests/get.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "requests",
+                "get.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "request delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n \"request_id\":7\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/requests/delete.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "requests",
+                "delete.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "request create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"user_id\":1,\r\n  \"service_id\":3,\r\n  \"dept_id\":3,\r\n  \"reason\":\"test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/requests/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "requests",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "request get user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/requests/get_user.php?user_id=1",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "requests",
+                "get_user.php"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "request update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"request_id\":7,\r\n  \"status\": \"approved\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/requests/update_status.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "requests",
+                "update_status.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "request cancel",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"request_id\":6,\r\n  \"user_id\":1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/requests/cancel.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "requests",
+                "cancel.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "request_details",
+      "item": [
+        {
+          "name": "details get",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/request_details/get.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "request_details",
+                "get.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "details delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n    \"detail_id\":19\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/request_details/delete.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "request_details",
+                "delete.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "details update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"detail_id\":19,\r\n  \"field\": \"اللغة\",\r\n  \"value\": \"فرنسي\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/request_details/update.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "request_details",
+                "update.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "details create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"request_id\":8,\r\n  \"field\": \"اللغة\",\r\n  \"value\":\"فرنسي\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/request_details/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "request_details",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "logs",
+      "item": [
+        {
+          "name": "log get",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/logs/get.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "logs",
+                "get.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "log create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"request_id\": 2,\r\n    \"user_id\": 1,\r\n    \"new_status\": \"approved\",\r\n    \"notes\": \"Approved by admin\"\r\n}"
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/logs/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "logs",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "employees",
+      "item": [
+        {
+          "name": "employee get",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/employees/get.php?user_id=5",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "employees",
+                "get.php"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "employee create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"user_id\": 1,\r\n    \"employee_type\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/employees/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "employees",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "employee update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"user_id\":2,\r\n    \"employee_type\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/employees/update.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "employees",
+                "update.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "departments",
+      "item": [
+        {
+          "name": "department get",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/departments/get.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "departments",
+                "get.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "department create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"ميكا\"\r\n}"
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/departments/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "departments",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "department update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"dept_id\": 3,\r\n    \"name\": \"اتصالات\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/departments/update.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "departments",
+                "update.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "department delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"dept_id\":3\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/departments/delete.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "departments",
+                "delete.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "attachments",
+      "item": [
+        {
+          "name": "attachment get",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/attachments/get.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "attachments",
+                "get.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "attachment create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "request_id",
+                  "type": "text",
+                  "uuid": "86a4144f-0a20-4be9-a554-bb05921b3c9c",
+                  "value": "1"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "41f19729-50cf-451a-a13b-9aef1e982798",
+                  "src": "/C:/Users/lenovo/Desktop/pdf/زمن جلسة 3.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/attachments/create.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "attachments",
+                "create.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "attacchment upload",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "request_id",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "6e0dc45b-686c-4685-a440-f2040fa35a0c"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "977a0dbc-d7c6-40db-a683-3b98b90e80d2",
+                  "src": "/C:/Users/lenovo/Desktop/pdf/زمن جلسة 3.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/attachments/upload.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "attachments",
+                "upload.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"ahmed@example.com\",\r\n    \"password\": \"123445\"\r\n   \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/users/login.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "users",
+                "login.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"sara\",\r\n    \"email\": \"sara@example.com\",\r\n    \"password\": \"186455\",\r\n    \"role\": \"student\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://gold-frog-148844.hostingersite.com/users/register.php",
+              "protocol": "https",
+              "host": [
+                "gold-frog-148844",
+                "hostingersite",
+                "com"
+              ],
+              "path": [
+                "users",
+                "register.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

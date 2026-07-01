@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلباتي | الطالب</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div id="requestsContainer"></div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.STUDENT)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.STUDENT,
+            active: "requests",
+            title: "طلباتي",
+            subtitle: "جميع طلباتك المقدمة"
+        });
+
+        await loadRequests();
+    });
+
+    async function loadRequests() {
+        const container = document.getElementById("requestsContainer");
+        Utils.showLoading(container);
+
+        try {
+            const user = Auth.getUser();
+            const result = await API.getUserRequests(user.user_id);
+            const data = result.data || [];
+
+            if (data.length === 0) {
+                Utils.showEmpty(container, "لا توجد طلبات بعد", "ri-file-list-3-line");
+                return;
+            }
+
+            container.innerHTML = data.map(req => `
+                <div class="request-card">
+                    <h3><i class="ri-file-text-line"></i> ${req.service_name || "طلب"}</h3>
+                    <p>رقم التتبع: <strong>${req.tracking_no || req.request_id}</strong></p>
+                    <p>الحالة: <span class="status ${req.status}">${Utils.formatStatus(req.status)}</span></p>
+                    <p><i class="ri-calendar-line"></i> ${req.req_date || "-"}</p>
+                    <button class="btn btn-primary" onclick="openDetails(${req.request_id})">
+                        <i class="ri-eye-line"></i> عرض التفاصيل
+                    </button>
+                </div>
+            `).join("");
+        } catch (err) {
+            Utils.showError(container);
+        }
+    }
+
+    function openDetails(id) {
+        window.location.href = `request-details.html?id=${id}`;
+    }
+    </script>
+</body>
+</html>

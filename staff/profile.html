@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي | الموظف</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div class="profile-layout">
+                <div class="profile-sidebar">
+                    <div class="profile-avatar" id="avatar">M</div>
+                    <h2 id="nameView">-</h2>
+                    <div class="profile-role" id="roleView">-</div>
+                    <p class="profile-email" id="emailView">-</p>
+                </div>
+                <div class="profile-form">
+                    <h3 class="card-title"><i class="ri-user-settings-line"></i> بيانات الموظف</h3>
+                    <div class="form-group">
+                        <label for="fullName">الاسم الكامل</label>
+                        <input type="text" id="fullName" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">البريد الإلكتروني</label>
+                        <input type="email" id="email" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="employeeType">نوع الموظف</label>
+                        <input type="text" id="employeeType" class="form-control" disabled>
+                    </div>
+                    <button type="button" class="btn btn-primary" style="width:100%;" onclick="updateProfile()">
+                        <i class="ri-save-line"></i> حفظ التعديلات
+                    </button>
+                    <p class="text-muted" style="margin-top:12px;font-size:0.875rem;">
+                        * تعديل البريد ونوع الموظف يتم من قبل الإدارة فقط
+                    </p>
+                </div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.EMPLOYEE)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.EMPLOYEE,
+            active: "profile",
+            title: "الملف الشخصي",
+            subtitle: "إدارة بيانات الموظف"
+        });
+
+        await loadProfile();
+    });
+
+    async function loadProfile() {
+        const user = Auth.getUser();
+        try {
+            const result = await API.getEmployee(user.user_id);
+
+            if (result.data) {
+                const emp = result.data;
+                document.getElementById("nameView").textContent = emp.name || user.name || "موظف";
+                document.getElementById("fullName").value = emp.name || user.name || "";
+                document.getElementById("email").value = emp.email || user.email || "";
+                document.getElementById("emailView").textContent = emp.email || user.email || "";
+                document.getElementById("employeeType").value = Utils.formatRole(emp.employee_type) || "-";
+                document.getElementById("roleView").textContent = Utils.formatRole(emp.employee_type) || Utils.formatRole(user.role);
+                document.getElementById("avatar").textContent = (emp.name || user.name || "M").charAt(0);
+            } else {
+                document.getElementById("nameView").textContent = user.name || "موظف";
+                document.getElementById("fullName").value = user.name || "";
+                document.getElementById("email").value = user.email || "";
+                document.getElementById("emailView").textContent = user.email || "";
+            }
+        } catch (err) {
+            alert("فشل تحميل بيانات الملف الشخصي");
+        }
+    }
+
+    async function updateProfile() {
+        const user = Auth.getUser();
+        const name = document.getElementById("fullName").value.trim();
+
+        if (!name) {
+            alert("يرجى إدخال الاسم");
+            return;
+        }
+
+        try {
+            const result = await API.updateEmployee(user.user_id, name);
+
+            if (result.status === 200) {
+                localStorage.setItem("name", name);
+                alert("تم التحديث بنجاح");
+                await loadProfile();
+            } else {
+                alert(result.message || "فشل التحديث");
+            }
+        } catch (err) {
+            alert(err.message || "فشل التحديث");
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الطلبات الواردة | الموظف</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div class="filters-bar">
+                <input type="text" id="search" class="form-control" placeholder="بحث برقم الطلب...">
+                <select id="statusFilter" class="form-control">
+                    <option value="">كل الحالات</option>
+                    <option value="pending">قيد المراجعة</option>
+                    <option value="approved">مقبولة</option>
+                    <option value="rejected">مرفوضة</option>
+                </select>
+            </div>
+
+            <div class="content-card">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>الطالب</th>
+                                <th>الخدمة</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="6" class="table-state">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    let allRequests = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.EMPLOYEE)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.EMPLOYEE,
+            active: "requests",
+            title: "الطلبات الواردة",
+            subtitle: "جميع طلبات الطلاب"
+        });
+
+        document.getElementById("search").addEventListener("input", filterData);
+        document.getElementById("statusFilter").addEventListener("change", filterData);
+
+        await loadRequests();
+    });
+
+    async function loadRequests() {
+        Utils.renderTableLoading("tableBody", 6);
+        try {
+            const result = await API.getAllRequests();
+            allRequests = result.data || [];
+            renderTable(allRequests);
+        } catch (err) {
+            Utils.renderTableError("tableBody", 6);
+        }
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById("tableBody");
+        if (data.length === 0) {
+            Utils.renderTableEmpty(tbody, 6);
+            return;
+        }
+
+        tbody.innerHTML = data.map(r => `
+            <tr>
+                <td>${r.tracking_no || r.request_id}</td>
+                <td>${r.student_name || r.user_name || "-"}</td>
+                <td>${r.service_name || "-"}</td>
+                <td><span class="status ${r.status}">${Utils.formatStatus(r.status)}</span></td>
+                <td>${r.req_date || "-"}</td>
+                <td class="table-actions">
+                    <a href="review-request.html?id=${r.request_id}" class="btn btn-primary">مراجعة</a>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    function filterData() {
+        const search = document.getElementById("search").value.toLowerCase();
+        const status = document.getElementById("statusFilter").value;
+
+        const filtered = allRequests.filter(r => {
+            const tracking = String(r.tracking_no || r.request_id || "");
+            const matchSearch = tracking.includes(search) || (r.student_name || "").toLowerCase().includes(search);
+            const matchStatus = status ? r.status === status : true;
+            return matchSearch && matchStatus;
+        });
+
+        renderTable(filtered);
+    }
+    </script>
+</body>
+</html>

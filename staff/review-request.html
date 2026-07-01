@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراجعة الطلب | الموظف</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div id="reviewContainer">
+                <div class="state-message state-loading"><i class="ri-loader-4-line"></i><p>جاري التحميل...</p></div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    let requestId = Utils.getQueryParam("id");
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.EMPLOYEE)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.EMPLOYEE,
+            active: "requests",
+            title: "مراجعة الطلب",
+            subtitle: "تفاصيل الطلب واتخاذ القرار"
+        });
+
+        await loadRequest();
+    });
+
+    async function loadRequest() {
+        const container = document.getElementById("reviewContainer");
+
+        if (!requestId) {
+            Utils.showError(container, "معرف الطلب غير موجود");
+            return;
+        }
+
+        try {
+            const result = await API.getAllRequests();
+            const req = (result.data || []).find(r => r.request_id == requestId);
+
+            if (!req) {
+                Utils.showError(container, "الطلب غير موجود");
+                return;
+            }
+
+            const isPending = req.status === "pending";
+
+            container.innerHTML = `
+                <div class="content-card">
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <label>رقم الطلب</label>
+                            <p>#${req.tracking_no || req.request_id}</p>
+                        </div>
+                        <div class="info-box">
+                            <label>اسم الطالب</label>
+                            <p>${req.student_name || req.user_name || "غير معروف"}</p>
+                        </div>
+                        <div class="info-box">
+                            <label>الخدمة</label>
+                            <p>${req.service_name || "-"}</p>
+                        </div>
+                        <div class="info-box">
+                            <label>التاريخ</label>
+                            <p>${req.req_date || "-"}</p>
+                        </div>
+                        <div class="info-box">
+                            <label>الحالة الحالية</label>
+                            <p><span class="status ${req.status}">${Utils.formatStatus(req.status)}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin:20px 0;">
+                        <label>تفاصيل الطلب</label>
+                        <p>${req.reason || "لا يوجد"}</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        ${isPending ? `
+                            <button class="btn btn-success" onclick="updateStatus('approved')">
+                                <i class="ri-check-line"></i> قبول
+                            </button>
+                            <button class="btn btn-danger" onclick="updateStatus('rejected')">
+                                <i class="ri-close-line"></i> رفض
+                            </button>
+                        ` : `<p class="text-muted">تم معالجة هذا الطلب مسبقاً</p>`}
+                        <a href="request-list.html" class="btn btn-outline">
+                            <i class="ri-arrow-right-line"></i> العودة للقائمة
+                        </a>
+                    </div>
+                </div>
+            `;
+        } catch (err) {
+            Utils.showError(container);
+        }
+    }
+
+    async function updateStatus(status) {
+        if (!confirm(status === "approved" ? "هل تريد قبول هذا الطلب؟" : "هل تريد رفض هذا الطلب؟")) {
+            return;
+        }
+
+        try {
+            const result = await API.updateRequestStatus(Number(requestId), status);
+
+            if (result.status === 200) {
+                alert("تم تحديث الطلب بنجاح");
+                window.location.href = "request-list.html";
+            } else {
+                alert(result.message || "فشل التحديث");
+            }
+        } catch (err) {
+            alert(err.message || "فشل الاتصال بالسيرفر");
+        }
+    }
+    </script>
+</body>
+</html>

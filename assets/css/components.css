@@ -1,0 +1,328 @@
+/* ===== Cards ===== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--color-bg-card);
+    padding: 22px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card);
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+    display: block;
+}
+
+.stat-card h3 {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+/* ===== Content Card ===== */
+.content-card {
+    background: var(--color-bg-card);
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+}
+
+.content-card + .content-card {
+    margin-top: 20px;
+}
+
+.card-title {
+    font-size: 1.125rem;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===== Tables ===== */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 14px 16px;
+    text-align: center;
+}
+
+.data-table th {
+    background: var(--color-bg);
+    color: var(--color-text-label);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid var(--color-border);
+    transition: var(--transition);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table-state {
+    text-align: center;
+    padding: 30px !important;
+    color: var(--color-text-muted);
+}
+
+.table-state-error {
+    color: var(--color-danger);
+}
+
+.table-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.table-actions .btn {
+    padding: 8px 14px;
+    font-size: 0.8125rem;
+}
+
+/* ===== Filters ===== */
+.filters-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-md);
+}
+
+.filters-bar .form-control {
+    flex: 1;
+    min-width: 160px;
+}
+
+/* ===== Request Cards (student list) ===== */
+.request-card {
+    background: var(--color-bg-card);
+    padding: 20px;
+    margin-bottom: 14px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+}
+
+.request-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card);
+}
+
+.request-card h3 {
+    color: var(--color-text);
+    margin-bottom: 10px;
+}
+
+.request-card p {
+    margin-top: 6px;
+    font-size: 0.9375rem;
+}
+
+.request-card .btn {
+    margin-top: 14px;
+}
+
+/* ===== Profile Layout ===== */
+.profile-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+}
+
+.profile-sidebar {
+    background: var(--color-bg-card);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    border: 1px solid var(--color-border);
+}
+
+.profile-avatar {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), #2563eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--color-bg);
+}
+
+.profile-sidebar h2 {
+    margin-bottom: 6px;
+}
+
+.profile-role {
+    color: var(--color-primary);
+    font-size: 0.9375rem;
+    margin-bottom: 8px;
+}
+
+.profile-email {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+}
+
+.profile-form {
+    background: var(--color-bg-card);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ===== Chart Box ===== */
+.chart-container {
+    margin-top: 24px;
+    background: var(--color-bg-card);
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.chart-container canvas {
+    max-height: 300px;
+}
+
+/* ===== Info Grid (review page) ===== */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.info-box {
+    background: var(--color-bg);
+    padding: 16px;
+    border-radius: var(--radius-md);
+}
+
+.info-box label {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    margin-bottom: 4px;
+}
+
+.info-box p {
+    color: var(--color-text);
+    margin: 0;
+}
+
+/* ===== State Messages ===== */
+.state-message {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--color-text-muted);
+}
+
+.state-message i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.state-loading i {
+    animation: spin 1s linear infinite;
+    color: var(--color-primary);
+}
+
+.state-empty i {
+    color: var(--color-text-muted);
+}
+
+.state-error i {
+    color: var(--color-danger);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ===== Review Actions ===== */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .filters-bar {
+        flex-direction: column;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+    }
+}

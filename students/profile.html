@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي | الطالب</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div class="profile-layout">
+                <div class="profile-sidebar">
+                    <div class="profile-avatar"><i class="ri-user-3-fill"></i></div>
+                    <h2 id="nameView">-</h2>
+                    <div class="profile-role" id="roleView">طالب</div>
+                    <p class="profile-email" id="emailView">-</p>
+                </div>
+                <div class="profile-form">
+                    <h3 class="card-title"><i class="ri-edit-line"></i> البيانات الأكاديمية</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="university_no">الرقم الجامعي</label>
+                            <input type="text" id="university_no" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="study_year">السنة الدراسية</label>
+                            <input type="text" id="study_year" class="form-control">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="updateProfile()">
+                        <i class="ri-save-line"></i> حفظ التعديلات
+                    </button>
+                </div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    let currentStudentId = null;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.STUDENT)) return;
+
+        const user = Auth.getUser();
+        AppLayout.init({
+            role: AppConfig.ROLES.STUDENT,
+            active: "profile",
+            title: "الملف الشخصي",
+            subtitle: "إدارة بيانات الطالب"
+        });
+
+        document.getElementById("nameView").textContent = user.name || "طالب";
+        document.getElementById("emailView").textContent = user.email || "";
+        document.getElementById("roleView").textContent = Utils.formatRole(user.role);
+
+        await loadProfile();
+    });
+
+    async function loadProfile() {
+        const user = Auth.getUser();
+        try {
+            const result = await API.getStudents();
+            const student = (result.data || []).find(s => s.user_id == user.user_id);
+
+            if (student) {
+                currentStudentId = student.student_id;
+                document.getElementById("university_no").value = student.university_no || "";
+                document.getElementById("study_year").value = student.study_year || "";
+            }
+        } catch (err) {
+            alert("فشل تحميل بيانات الملف الشخصي");
+        }
+    }
+
+    async function updateProfile() {
+        if (!currentStudentId) {
+            alert("لم يتم العثور على سجل الطالب. تواصل مع الإدارة.");
+            return;
+        }
+
+        try {
+            const result = await API.updateStudent(
+                currentStudentId,
+                document.getElementById("university_no").value.trim(),
+                document.getElementById("study_year").value.trim()
+            );
+
+            if (result.status === 200) {
+                alert("تم التحديث بنجاح");
+                await loadProfile();
+            } else {
+                alert(result.message || "فشل التحديث");
+            }
+        } catch (err) {
+            alert(err.message || "فشل التحديث");
+        }
+    }
+    </script>
+</body>
+</html>

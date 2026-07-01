@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل المعالجة | الموظف</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div class="content-card">
+                <h3 class="card-title"><i class="ri-history-line"></i> الطلبات المعالجة</h3>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>الخدمة</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable">
+                            <tr><td colspan="5" class="table-state">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.EMPLOYEE)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.EMPLOYEE,
+            active: "history",
+            title: "سجل المعالجة",
+            subtitle: "الطلبات المقبولة والمرفوضة"
+        });
+
+        await loadHistory();
+    });
+
+    async function loadHistory() {
+        const tbody = document.getElementById("historyTable");
+        Utils.renderTableLoading(tbody, 5);
+
+        try {
+            const result = await API.getAllRequests();
+            const history = (result.data || []).filter(r =>
+                r.status === "approved" || r.status === "rejected"
+            );
+
+            if (history.length === 0) {
+                Utils.renderTableEmpty(tbody, 5, "لا يوجد سجل بعد");
+                return;
+            }
+
+            tbody.innerHTML = history.map(req => `
+                <tr>
+                    <td>${req.tracking_no || req.request_id || "-"}</td>
+                    <td>${req.service_name || "-"}</td>
+                    <td><span class="status ${req.status}">${Utils.formatStatus(req.status)}</span></td>
+                    <td>${req.req_date || "-"}</td>
+                    <td class="table-actions">
+                        <a href="review-request.html?id=${req.request_id}" class="btn btn-outline">عرض</a>
+                    </td>
+                </tr>
+            `).join("");
+        } catch (err) {
+            Utils.renderTableError(tbody, 5);
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | الموظف</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div class="cards-grid">
+                <div class="stat-card">
+                    <i class="ri-mail-open-line"></i>
+                    <h3>إجمالي الطلبات</h3>
+                    <p class="stat-value" id="totalRequests">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="ri-loader-4-line"></i>
+                    <h3>قيد المعالجة</h3>
+                    <p class="stat-value" id="pendingRequests">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="ri-checkbox-circle-line"></i>
+                    <h3>مقبولة</h3>
+                    <p class="stat-value" id="approvedRequests">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="ri-close-circle-line"></i>
+                    <h3>مرفوضة</h3>
+                    <p class="stat-value" id="rejectedRequests">0</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3 class="card-title"><i class="ri-time-line"></i> آخر الطلبات</h3>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>الخدمة</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTable">
+                            <tr><td colspan="5" class="table-state">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.EMPLOYEE)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.EMPLOYEE,
+            active: "dashboard",
+            title: "لوحة تحكم الموظف",
+            subtitle: "نظرة عامة على الطلبات"
+        });
+
+        await loadDashboard();
+    }); 
+
+    async function loadDashboard() {
+        const tbody = document.getElementById("requestsTable");
+        Utils.renderTableLoading(tbody, 5);
+
+        try {
+            const result = await API.getAllRequests();
+            const requests = result.data || [];
+            const counts = Utils.countByStatus(requests);
+
+            Utils.setText("totalRequests", counts.total);
+            Utils.setText("pendingRequests", counts.pending);
+            Utils.setText("approvedRequests", counts.approved);
+            Utils.setText("rejectedRequests", counts.rejected);
+
+            const recent = requests.slice(0, 5);
+            if (recent.length === 0) {
+                Utils.renderTableEmpty(tbody, 5);
+                return;
+            }
+
+            tbody.innerHTML = recent.map(req => `
+                <tr>
+                    <td>${req.tracking_no || req.request_id}</td>
+                    <td>${req.service_name || "-"}</td>
+                    <td><span class="status ${req.status}">${Utils.formatStatus(req.status)}</span></td>
+                    <td>${req.req_date || "-"}</td>
+                    <td class="table-actions">
+                        <a href="review-request.html?id=${req.request_id}" class="btn btn-primary">مراجعة</a>
+                    </td>
+                </tr>
+            `).join("");
+        } catch (err) {
+            Utils.renderTableError(tbody, 5);
+        }
+    }
+    </script>
+</body>
+</html>

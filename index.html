@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة خدمات الجامعة</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <style>
+        .landing {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 24px;
+        }
+        .landing-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--color-bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--color-primary);
+            margin-bottom: 24px;
+        }
+        .landing h1 {
+            font-size: 2rem;
+            color: var(--color-primary);
+            margin-bottom: 12px;
+        }
+        .landing > p {
+            max-width: 520px;
+            margin-bottom: 32px;
+            font-size: 1.0625rem;
+        }
+        .landing-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing">
+        <div class="landing-icon">
+            <i class="ri-graduation-cap-line"></i>
+        </div>
+        <h1>نظام إدارة خدمات الجامعة</h1>
+        <p>منصة موحدة لتقديم ومتابعة الطلبات الإدارية والأكاديمية للطلاب، وإدارتها من قبل موظفي الجامعة.</p>
+        <div class="landing-actions">
+            <a href="users/login.html" class="btn btn-primary">
+                <i class="ri-login-box-line"></i> تسجيل الدخول
+            </a>
+            <a href="users/register.html" class="btn btn-outline">
+                <i class="ri-user-add-line"></i> إنشاء حساب طالب
+            </a>
+        </div>
+    </div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        if (Auth.isLoggedIn()) {
+            Auth.redirectByRole();
+        }
+    </script>
+</body>
+</html>

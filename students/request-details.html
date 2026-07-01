@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الطلب | الطالب</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div id="detailsContainer">
+                <div class="state-message state-loading"><i class="ri-loader-4-line"></i><p>جاري التحميل...</p></div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!Auth.requireRole(AppConfig.ROLES.STUDENT)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.STUDENT,
+            active: "requests",
+            title: "تفاصيل الطلب",
+            subtitle: "معلومات الطلب الكاملة"
+        });
+
+        await loadDetails();
+    });
+
+    async function loadDetails() {
+        const container = document.getElementById("detailsContainer");
+        const requestId = Utils.getQueryParam("id");
+        const user = Auth.getUser();
+
+        if (!requestId) {
+            Utils.showError(container, "معرف الطلب غير موجود");
+            return;
+        }
+
+        try {
+            const result = await API.getUserRequests(user.user_id);
+            const request = (result.data || []).find(r => r.request_id == requestId);
+
+            if (!request) {
+                Utils.showError(container, "الطلب غير موجود أو لا تملك صلاحية عرضه");
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="content-card">
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <label>رقم الطلب</label>
+                            <p>${request.tracking_no || request.request_id}</p>
+                        </div>
+                        <div class="info-box">
+                            <label>الخدمة</label>
+                            <p>${request.service_name || "-"}</p>
+                        </div>
+                        <div class="info-box">
+                            <label>الحالة</label>
+                            <p><span class="status ${request.status}">${Utils.formatStatus(request.status)}</span></p>
+                        </div>
+                        <div class="info-box">
+                            <label>التاريخ</label>
+                            <p>${request.req_date || "-"}</p>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin-top:16px;">
+                        <label>تفاصيل الطلب</label>
+                        <p>${request.reason || "لا يوجد"}</p>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="my-request.html" class="btn btn-outline">
+                            <i class="ri-arrow-right-line"></i> العودة للطلبات
+                        </a>
+                    </div>
+                </div>
+            `;
+        } catch (err) {
+            Utils.showError(container);
+        }
+    }
+    </script>
+</body>
+</html>

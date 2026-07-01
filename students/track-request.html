@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تتبع الطلب | الطالب</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <style>
+        .track-form { max-width: 480px; }
+        .track-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            position: relative;
+        }
+        .track-steps::before {
+            content: "";
+            position: absolute;
+            top: 14px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-border);
+        }
+        .track-step {
+            text-align: center;
+            flex: 1;
+            z-index: 1;
+        }
+        .track-step .circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--color-bg);
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        .track-step.active .circle {
+            background: var(--color-primary);
+            color: var(--color-bg);
+        }
+        .track-step p { font-size: 0.75rem; margin: 0; }
+        .track-result { display: none; margin-top: 24px; }
+        .track-result.visible { display: block; }
+    </style>
+</head>
+<body class="app-layout">
+    <div id="app-sidebar"></div>
+    <div class="app-main">
+        <div id="app-header"></div>
+        <main class="app-content">
+            <div class="content-card track-form">
+                <h2 class="card-title"><i class="ri-search-line"></i> تتبع الطلب</h2>
+                <p class="text-muted" style="margin-bottom:20px;">أدخل رقم التتبع لمعرفة حالة طلبك</p>
+
+                <div class="form-group">
+                    <input type="text" id="trackingNo" class="form-control" placeholder="رقم التتبع">
+                </div>
+                <button type="button" class="btn btn-primary" style="width:100%;" onclick="trackRequest()">
+                    <i class="ri-search-2-line"></i> بحث
+                </button>
+
+                <div id="trackResult" class="track-result content-card" style="padding:20px;margin-top:20px;">
+                    <h3 id="resultTitle">-</h3>
+                    <p>الحالة: <span id="resultStatus" class="status">-</span></p>
+                    <p class="text-muted" id="resultDate">-</p>
+                    <div class="track-steps" id="trackSteps"></div>
+                </div>
+            </div>
+        </main>
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/components/layout.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (!Auth.requireRole(AppConfig.ROLES.STUDENT)) return;
+
+        AppLayout.init({
+            role: AppConfig.ROLES.STUDENT,
+            active: "track",
+            title: "تتبع الطلب",
+            subtitle: "متابعة حالة الطلب"
+        });
+    });
+
+    async function trackRequest() {
+        const trackingNo = document.getElementById("trackingNo").value.trim();
+        const resultEl = document.getElementById("trackResult");
+
+        if (!trackingNo) {
+            alert("يرجى إدخال رقم التتبع");
+            return;
+        }
+
+        try {
+            const user = Auth.getUser();
+            const apiResult = await API.getUserRequests(user.user_id);
+            const requests = apiResult.data || [];
+
+            const request = requests.find(r =>
+                String(r.tracking_no) === trackingNo || String(r.request_id) === trackingNo
+            );
+
+            if (!request) {
+                alert("لم يتم العثور على طلب بهذا الرقم");
+                resultEl.classList.remove("visible");
+                return;
+            }
+
+            document.getElementById("resultTitle").textContent = `طلب #${request.tracking_no || request.request_id}`;
+            const statusEl = document.getElementById("resultStatus");
+            statusEl.textContent = Utils.formatStatus(request.status);
+            statusEl.className = `status ${request.status}`;
+            document.getElementById("resultDate").textContent = request.req_date || "";
+
+            renderSteps(request.status);
+            resultEl.classList.add("visible");
+        } catch (err) {
+            alert("فشل البحث عن الطلب");
+        }
+    }
+
+    function renderSteps(status) {
+        const steps = [
+            { label: "استلام", active: true },
+            { label: "مراجعة", active: true },
+            { label: "قرار", active: status === "approved" || status === "rejected" }
+        ];
+
+        if (status === "pending") {
+            steps[2].active = false;
+        }
+
+        document.getElementById("trackSteps").innerHTML = steps.map((s, i) => `
+            <div class="track-step ${s.active ? "active" : ""}">
+                <div class="circle">${i + 1}</div>
+                <p>${s.label}</p>
+            </div>
+        `).join("");
+    }
+    </script>
+</body>
+</html>
