@@ -51,7 +51,11 @@
         }
 
         try {
-            const result = await API.getAllRequests();
+            const [result, detailsRes] = await Promise.all([
+                API.getAllRequests(),
+                API.getRequestDetails(requestId)
+            ]);
+
             const req = (result.data || []).find(r => r.request_id == requestId);
 
             if (!req) {
@@ -59,6 +63,7 @@
                 return;
             }
 
+            const extraDetails = detailsRes.data || [];
             const isPending = req.status === "pending";
 
             container.innerHTML = `
@@ -91,6 +96,8 @@
                         <p>${req.reason || "لا يوجد"}</p>
                     </div>
 
+                    ${renderExtraDetails(extraDetails)}
+
                     <div class="action-buttons">
                         ${isPending ? `
                             <button class="btn btn-success" onclick="updateStatus('approved')">
@@ -111,13 +118,33 @@
         }
     }
 
+    function renderExtraDetails(extraDetails) {
+        if (!extraDetails || extraDetails.length === 0) return "";
+
+        const boxes = extraDetails.map(d => `
+            <div class="info-box">
+                <label>${d.field}</label>
+                <p>${d.value}</p>
+            </div>
+        `).join("");
+
+        return `
+            <div class="extra-details">
+                <h3 class="card-title"><i class="ri-file-list-3-line"></i> معلومات إضافية</h3>
+                <div class="info-grid">${boxes}</div>
+            </div>
+        `;
+    }
+
     async function updateStatus(status) {
         if (!confirm(status === "approved" ? "هل تريد قبول هذا الطلب؟" : "هل تريد رفض هذا الطلب؟")) {
             return;
         }
 
+        const user = Auth.getUser();
+
         try {
-            const result = await API.updateRequestStatus(Number(requestId), status);
+            const result = await API.createLog(Number(requestId), Number(user.user_id), status);
 
             if (result.status === 200) {
                 alert("تم تحديث الطلب بنجاح");

@@ -298,6 +298,124 @@
     flex-wrap: wrap;
 }
 
+/* ===== Conditional Fields (slide down/up when shown/hidden via JS) ===== */
+.conditional-fields {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+
+.conditional-fields.show {
+    max-height: 400px;
+    opacity: 1;
+}
+
+/* ===== Extra Details Block (request_details key/value list) ===== */
+.extra-details {
+    margin-top: 20px;
+}
+
+.extra-details .card-title {
+    font-size: 1rem;
+}
+
+/* ===== Request Timeline (Audit Log) ===== */
+/* RTL vertical timeline: the connecting line and each item's dot are drawn
+   with pseudo-elements so the markup only needs a title/date/notes per item. */
+.timeline {
+    position: relative;
+    padding-right: 28px;
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    right: 10px;
+    width: 2px;
+    background: var(--color-border);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 22px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    right: -24px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-bg-card);
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-bg-card);
+    z-index: 1;
+}
+
+.timeline-item.timeline-approved::after {
+    border-color: var(--color-success);
+}
+
+.timeline-item.timeline-rejected::after,
+.timeline-item.timeline-cancelled::after {
+    border-color: var(--color-danger);
+}
+
+.timeline-content {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+}
+
+.timeline-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.timeline-title i {
+    color: var(--color-primary);
+    font-size: 1.0625rem;
+}
+
+.timeline-item.timeline-approved .timeline-title i {
+    color: var(--color-success);
+}
+
+.timeline-item.timeline-rejected .timeline-title i,
+.timeline-item.timeline-cancelled .timeline-title i {
+    color: var(--color-danger);
+}
+
+.timeline-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+}
+
+.timeline-notes {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.875rem;
+    color: var(--color-text-label);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
     .profile-layout {

@@ -7,10 +7,15 @@ const AppConfig = {
         STUDENT: "student",
         EMPLOYEE: "employee"
     },
+    EMPLOYEE_TYPES: {
+        ADMIN: "admin",
+        OFFICER: "officer"
+    },
     PATHS: {
         login: "../users/login.html",
         register: "../users/register.html",
         studentDashboard: "../students/dashboard.html",
-        staffDashboard: "../staff/dashboard.html"
+        staffDashboard: "../staff/dashboard.html",
+        adminDashboard: "../admin/dashboard.html"
     }
 };

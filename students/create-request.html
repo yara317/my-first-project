@@ -33,6 +33,17 @@
                         </select>
                     </div>
 
+                    <div id="retakePracticalFields" class="conditional-fields">
+                        <div class="form-group">
+                            <label for="retakeSubject"><i class="ri-book-2-line"></i> المادة</label>
+                            <input type="text" id="retakeSubject" class="form-control" placeholder="اسم المادة المطلوب إعادة عملي فيها">
+                        </div>
+                        <div class="form-group">
+                            <label for="retakeSemester"><i class="ri-calendar-2-line"></i> الفصل والعام الدراسي</label>
+                            <input type="text" id="retakeSemester" class="form-control" placeholder="مثال: الفصل الأول 2025/2026">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="details"><i class="ri-edit-box-line"></i> تفاصيل الطلب</label>
                         <textarea id="details" class="form-control" maxlength="500" required></textarea>
@@ -40,9 +51,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="attachment"><i class="ri-attachment-2"></i> ملف مرفق (قريباً)</label>
-                        <input type="file" id="attachment" class="form-control" disabled>
-                        <small class="text-muted">سيتم تفعيل رفع الملفات في تحديث لاحق</small>
+                        <label for="attachment"><i class="ri-attachment-2"></i> ملف مرفق (اختياري)</label>
+                        <input type="file" id="attachment" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+                        <small class="text-muted">الملفات المسموحة: JPG, PNG, PDF - الحجم الأقصى 5 ميجابايت</small>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width:100%;">
@@ -75,7 +86,33 @@
         document.getElementById("details").addEventListener("input", (e) => {
             document.getElementById("charCount").textContent = e.target.value.length;
         });
+        document.getElementById("service_id").addEventListener("change", handleServiceChange);
     });
+
+    const RETAKE_PRACTICAL_KEYWORD = "إعادة عملي";
+
+    function isRetakePracticalService(selectEl) {
+        const selectedOption = selectEl.options[selectEl.selectedIndex];
+        return !!selectedOption && selectedOption.text.includes(RETAKE_PRACTICAL_KEYWORD);
+    }
+
+    function handleServiceChange(e) {
+        const fieldsBox = document.getElementById("retakePracticalFields");
+        const subjectInput = document.getElementById("retakeSubject");
+        const semesterInput = document.getElementById("retakeSemester");
+
+        if (isRetakePracticalService(e.target)) {
+            fieldsBox.classList.add("show");
+            subjectInput.setAttribute("required", "required");
+            semesterInput.setAttribute("required", "required");
+        } else {
+            fieldsBox.classList.remove("show");
+            subjectInput.removeAttribute("required");
+            semesterInput.removeAttribute("required");
+            subjectInput.value = "";
+            semesterInput.value = "";
+        }
+    }
 
     async function loadFormData() {
         try {
@@ -100,13 +137,34 @@
         }
     }
 
+    const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_ATTACHMENT_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+
     async function createRequest(e) {
         e.preventDefault();
         const user = Auth.getUser();
-        const service_id = document.getElementById("service_id").value;
+        const serviceSelect = document.getElementById("service_id");
+        const service_id = serviceSelect.value;
         const dept_id = document.getElementById("dept_id").value;
         const details = document.getElementById("details").value.trim();
+        const attachmentInput = document.getElementById("attachment");
+        const file = attachmentInput.files[0] || null;
+        const isRetakePractical = isRetakePracticalService(serviceSelect);
+        const retakeSubject = document.getElementById("retakeSubject").value.trim();
+        const retakeSemester = document.getElementById("retakeSemester").value.trim();
         const submitBtn = e.target.querySelector("button[type=submit]");
+
+        if (file) {
+            if (!ALLOWED_ATTACHMENT_TYPES.includes(file.type)) {
+                alert("نوع الملف غير مسموح. الأنواع المسموحة: JPG, PNG, PDF");
+                return;
+            }
+            if (file.size > MAX_ATTACHMENT_SIZE) {
+                alert("حجم الملف أكبر من 5 ميجابايت");
+                return;
+            }
+        }
+
         submitBtn.disabled = true;
 
         try {
@@ -118,9 +176,31 @@
             });
 
             if (result.status === 200 || result.status === 201) {
+                const requestId = result.data && result.data.request_id;
+
+                if (file && requestId) {
+                    const uploadResult = await API.uploadAttachment(requestId, file);
+                    if (uploadResult.status !== 200 && uploadResult.status !== 201) {
+                        alert("تم إرسال الطلب، ولكن فشل رفع الملف المرفق: " + (uploadResult.message || ""));
+                    }
+                }
+
+                if (isRetakePractical && requestId && (retakeSubject || retakeSemester)) {
+                    const detailResults = await Promise.all([
+                        retakeSubject ? API.createRequestDetail(requestId, "المادة", retakeSubject) : null,
+                        retakeSemester ? API.createRequestDetail(requestId, "الفصل والعام الدراسي", retakeSemester) : null
+                    ]);
+
+                    const detailFailed = detailResults.some(r => r && r.status !== 200 && r.status !== 201);
+                    if (detailFailed) {
+                        alert("تم إرسال الطلب، ولكن فشل حفظ بعض البيانات الإضافية (المادة/الفصل الدراسي)");
+                    }
+                }
+
                 alert("تم إرسال الطلب بنجاح");
                 e.target.reset();
                 document.getElementById("charCount").textContent = "0";
+                document.getElementById("retakePracticalFields").classList.remove("show");
                 window.location.href = "my-request.html";
             } else {
                 alert(result.message || "فشل إرسال الطلب");

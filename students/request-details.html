@@ -51,13 +51,21 @@
         }
 
         try {
-            const result = await API.getUserRequests(user.user_id);
-            const request = (result.data || []).find(r => r.request_id == requestId);
+            const [requestsRes, detailsRes, logsRes] = await Promise.all([
+                API.getUserRequests(user.user_id),
+                API.getRequestDetails(requestId),
+                API.getLogs({ request_id: requestId })
+            ]);
+
+            const request = (requestsRes.data || []).find(r => r.request_id == requestId);
 
             if (!request) {
                 Utils.showError(container, "الطلب غير موجود أو لا تملك صلاحية عرضه");
                 return;
             }
+
+            const extraDetails = detailsRes.data || [];
+            const timelineEvents = buildTimeline(request, logsRes.data || []);
 
             container.innerHTML = `
                 <div class="content-card">
@@ -83,16 +91,160 @@
                         <label>تفاصيل الطلب</label>
                         <p>${request.reason || "لا يوجد"}</p>
                     </div>
+                    ${renderExtraDetails(extraDetails)}
                     <div class="action-buttons">
+                        ${request.status === "pending" ? `
+                            <button class="btn btn-danger" onclick="cancelRequest(${request.request_id})">
+                                <i class="ri-close-circle-line"></i> إلغاء الطلب
+                            </button>
+                        ` : ""}
                         <a href="my-request.html" class="btn btn-outline">
                             <i class="ri-arrow-right-line"></i> العودة للطلبات
                         </a>
                     </div>
                 </div>
+
+                <div class="content-card" style="margin-top:20px;">
+                    <h3 class="card-title"><i class="ri-history-line"></i> سجل تتبع الطلب</h3>
+                    ${renderTimeline(timelineEvents)}
+                </div>
             `;
         } catch (err) {
             Utils.showError(container);
         }
+    }
+
+    async function cancelRequest(requestId) {
+        if (!confirm("هل أنت متأكد من إلغاء هذا الطلب؟ لا يمكن التراجع عن هذه الخطوة.")) return;
+
+        const user = Auth.getUser();
+
+        try {
+            const result = await API.cancelRequest(requestId, user.user_id);
+
+            if (result.status === 200) {
+                alert("تم إلغاء الطلب بنجاح");
+                await loadDetails();
+            } else {
+                alert(result.message || "فشل إلغاء الطلب");
+            }
+        } catch (err) {
+            alert(err.message || "فشل الاتصال بالسيرفر");
+        }
+    }
+
+    const ARABIC_MONTHS = [
+        "كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران",
+        "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"
+    ];
+
+    // logs.log_date / requests.req_date are stored as DATE (no time-of-day),
+    // so the timeline only ever displays a day - no fabricated clock time.
+    function formatLogDate(dateStr) {
+        if (!dateStr) return "-";
+
+        const parts = String(dateStr).split(/[- T]/).map(Number);
+        const [year, month, day] = parts;
+
+        if (!year || !month || !day) return dateStr;
+
+        return `${day} ${ARABIC_MONTHS[month - 1]} ${year}`;
+    }
+
+    const STATUS_EVENT_META = {
+        pending: { label: "قيد المراجعة", icon: "ri-time-line", cssClass: "" },
+        approved: { label: "تمت الموافقة على الطلب", icon: "ri-checkbox-circle-line", cssClass: "timeline-approved" },
+        rejected: { label: "تم رفض الطلب", icon: "ri-close-circle-line", cssClass: "timeline-rejected" },
+        cancelled: { label: "تم إلغاء الطلب", icon: "ri-forbid-line", cssClass: "timeline-cancelled" }
+    };
+
+    function eventMetaFor(status) {
+        return STATUS_EVENT_META[status] || { label: Utils.formatStatus(status), icon: "ri-information-line", cssClass: "" };
+    }
+
+    /**
+     * Builds a chronological list of timeline events for a request.
+     * The `logs` table only records status *transitions* (created by staff
+     * via logs/create.php) - there's no row for the initial creation, and
+     * student self-cancellation (requests/cancel.php) doesn't log either.
+     * So we synthesize the "created" event from the request itself, and if
+     * the request's current status still isn't reflected by the last real
+     * log entry, we append a final synthesized event too.
+     */
+    function buildTimeline(request, logs) {
+        const sortedLogs = (logs || []).slice().sort((a, b) => new Date(a.log_date) - new Date(b.log_date));
+
+        const events = [{
+            status: "pending",
+            label: "تم إنشاء الطلب",
+            icon: "ri-flag-line",
+            cssClass: "",
+            date: request.req_date,
+            notes: null
+        }];
+
+        sortedLogs.forEach(log => {
+            const meta = eventMetaFor(log.new_status);
+            events.push({
+                status: log.new_status,
+                label: meta.label,
+                icon: meta.icon,
+                cssClass: meta.cssClass,
+                date: log.log_date,
+                notes: log.notes
+            });
+        });
+
+        const lastEvent = events[events.length - 1];
+        if (lastEvent.status !== request.status) {
+            const meta = eventMetaFor(request.status);
+            events.push({
+                status: request.status,
+                label: meta.label,
+                icon: meta.icon,
+                cssClass: meta.cssClass,
+                date: request.updated_at || request.req_date,
+                notes: null
+            });
+        }
+
+        return events;
+    }
+
+    function renderTimeline(events) {
+        if (!events || events.length === 0) {
+            return `<div class="state-message state-empty"><i class="ri-history-line"></i><p>لا توجد سجلات تتبع لهذا الطلب حالياً</p></div>`;
+        }
+
+        const items = events.map(ev => `
+            <div class="timeline-item ${ev.cssClass}">
+                <div class="timeline-content">
+                    <div class="timeline-title"><i class="${ev.icon}"></i> ${ev.label}</div>
+                    <div class="timeline-date"><i class="ri-calendar-2-line"></i> ${formatLogDate(ev.date)}</div>
+                    ${ev.notes ? `<div class="timeline-notes">${ev.notes}</div>` : ""}
+                </div>
+            </div>
+        `).join("");
+
+        return `<div class="timeline">${items}</div>`;
+    }
+
+    function renderExtraDetails(extraDetails) {
+        if (!extraDetails || extraDetails.length === 0) return "";
+
+        const boxes = extraDetails.map(d => `
+            <div class="info-box">
+                <label>${d.field}</label>
+                <p>${d.value}</p>
+            </div>
+        `).join("");
+
+        return `
+            <div class="extra-details">
+                <h3 class="card-title"><i class="ri-file-list-3-line"></i> معلومات إضافية</h3>
+                <div class="info-grid">${boxes}</div>
+            </div>
+        `;
     }
     </script>
 </body>

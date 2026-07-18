@@ -10,7 +10,8 @@ const Auth = {
             user_id: userId,
             role: localStorage.getItem("role"),
             name: localStorage.getItem("name"),
-            email: localStorage.getItem("email")
+            email: localStorage.getItem("email"),
+            employee_type: localStorage.getItem("employee_type") || null
         };
     },
 
@@ -19,6 +20,12 @@ const Auth = {
         localStorage.setItem("role", user.role);
         localStorage.setItem("name", user.name);
         localStorage.setItem("email", user.email);
+
+        if (user.employee_type) {
+            localStorage.setItem("employee_type", user.employee_type);
+        } else {
+            localStorage.removeItem("employee_type");
+        }
     },
 
     logout() {
@@ -34,12 +41,23 @@ const Auth = {
         return localStorage.getItem("role") === role;
     },
 
+    /**
+     * True only for employee accounts whose employee_type is "admin".
+     * Officers (employee_type "officer") are routed to the regular staff area.
+     */
+    isAdmin() {
+        return this.hasRole(AppConfig.ROLES.EMPLOYEE) &&
+            localStorage.getItem("employee_type") === AppConfig.EMPLOYEE_TYPES.ADMIN;
+    },
+
     redirectByRole() {
         const role = localStorage.getItem("role");
         if (role === AppConfig.ROLES.STUDENT) {
             window.location.href = AppConfig.PATHS.studentDashboard;
         } else if (role === AppConfig.ROLES.EMPLOYEE) {
-            window.location.href = AppConfig.PATHS.staffDashboard;
+            window.location.href = this.isAdmin()
+                ? AppConfig.PATHS.adminDashboard
+                : AppConfig.PATHS.staffDashboard;
         }
     },
 
@@ -55,6 +73,25 @@ const Auth = {
 
         if (!this.hasRole(requiredRole)) {
             alert("ليس لديك صلاحية للوصول إلى هذه الصفحة");
+            this.redirectByRole();
+            return false;
+        }
+
+        return true;
+    },
+
+    /**
+     * Strictly protect /admin/* pages: requires an employee account with
+     * employee_type "admin". Call on DOMContentLoaded of every admin page.
+     */
+    requireAdmin() {
+        if (!this.isLoggedIn()) {
+            window.location.href = AppConfig.PATHS.login;
+            return false;
+        }
+
+        if (!this.isAdmin()) {
+            alert("هذه الصفحة مخصصة لمدير النظام فقط");
             this.redirectByRole();
             return false;
         }

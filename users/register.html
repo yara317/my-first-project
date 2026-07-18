@@ -16,19 +16,14 @@
     </div>
 
     <h1>إنشاء حساب طالب</h1>
-    <p>سجل حسابك كطالب للوصول إلى خدمات الجامعة</p>
-
-    <div class="auth-note">
-        <i class="ri-information-line"></i>
-        التسجيل متاح للطلاب فقط. حسابات الموظفين تُنشأ من قبل الإدارة.
-    </div>
+    <p style="margin-bottom: 32px;">سجل حسابك كطالب للوصول إلى خدمات الجامعة</p>
 
     <form id="registerForm">
         <div class="form-group">
             <label for="name">الاسم الكامل</label>
             <div class="input-box">
                 <i class="ri-user-line"></i>
-                <input type="text" id="name" required autocomplete="name">
+                <input type="text" id="name" required autocomplete="name" placeholder="أدخل اسمك الكامل">
             </div>
         </div>
 
@@ -36,19 +31,21 @@
             <label for="email">البريد الإلكتروني</label>
             <div class="input-box">
                 <i class="ri-mail-line"></i>
-                <input type="email" id="email" required autocomplete="email">
+                <input type="email" id="email" required autocomplete="email" placeholder="example@student.edu">
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 24px;">
             <label for="password">كلمة المرور</label>
             <div class="input-box">
                 <i class="ri-lock-line"></i>
-                <input type="password" id="password" required minlength="6" autocomplete="new-password">
+                <input type="password" id="password" required minlength="6" autocomplete="new-password" placeholder="••••••••">
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">إنشاء الحساب</button>
+        <div id="formMessage" role="alert" style="display:none; margin-bottom:16px; padding:12px 16px; border-radius: var(--radius-md); border: 1px solid; font-size: 0.875rem; text-align:center; transition: var(--transition);"></div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 4px;">إنشاء الحساب</button>
     </form>
 
     <div class="auth-footer">
@@ -63,8 +60,34 @@
 document.addEventListener("DOMContentLoaded", () => {
     Auth.redirectIfLoggedIn();
 
+    const messageBox = document.getElementById("formMessage");
+
+    // Maps known backend response codes to polite Arabic messages.
+    // Any unrecognized/raw backend text falls back to a generic friendly message
+    // so technical errors are never shown to the user.
+    const ERROR_MESSAGES = {
+        "invalid email": "صيغة البريد الإلكتروني غير صحيحة",
+        "password too short": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+        "email already exists": "هذا البريد الإلكتروني مستخدم مسبقاً، جرب بريداً آخر"
+    };
+    const DEFAULT_ERROR_MESSAGE = "حدث خطأ أثناء التسجيل، يرجى التأكد من البيانات أو المحاولة لاحقاً";
+
+    function showMessage(type, text) {
+        const isSuccess = type === "success";
+        messageBox.textContent = text;
+        messageBox.style.display = "block";
+        messageBox.style.background = isSuccess ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)";
+        messageBox.style.borderColor = isSuccess ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)";
+        messageBox.style.color = isSuccess ? "var(--color-success)" : "var(--color-danger)";
+    }
+
+    function hideMessage() {
+        messageBox.style.display = "none";
+    }
+
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
         e.preventDefault();
+        hideMessage();
 
         const name = document.getElementById("name").value.trim();
         const email = document.getElementById("email").value.trim();
@@ -77,14 +100,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = await API.register(name, email, password);
 
             if (result.status === 200 || result.status === 201) {
-                alert("تم إنشاء الحساب بنجاح. يمكنك تسجيل الدخول الآن.");
-                window.location.href = "login.html";
+                showMessage("success", "تم إنشاء الحساب بنجاح، جاري تحويلك...");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1500);
             } else {
-                alert(result.message || "فشل إنشاء الحساب");
+                showMessage("error", ERROR_MESSAGES[result.message] || DEFAULT_ERROR_MESSAGE);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "إنشاء الحساب";
             }
         } catch (err) {
-            alert(err.message || "فشل الاتصال بالسيرفر");
-        } finally {
+            showMessage("error", DEFAULT_ERROR_MESSAGE);
             submitBtn.disabled = false;
             submitBtn.textContent = "إنشاء الحساب";
         }

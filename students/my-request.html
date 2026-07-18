@@ -38,6 +38,8 @@
         await loadRequests();
     });
 
+    let allRequests = [];
+
     async function loadRequests() {
         const container = document.getElementById("requestsContainer");
         Utils.showLoading(container);
@@ -45,31 +47,64 @@
         try {
             const user = Auth.getUser();
             const result = await API.getUserRequests(user.user_id);
-            const data = result.data || [];
-
-            if (data.length === 0) {
-                Utils.showEmpty(container, "لا توجد طلبات بعد", "ri-file-list-3-line");
-                return;
-            }
-
-            container.innerHTML = data.map(req => `
-                <div class="request-card">
-                    <h3><i class="ri-file-text-line"></i> ${req.service_name || "طلب"}</h3>
-                    <p>رقم التتبع: <strong>${req.tracking_no || req.request_id}</strong></p>
-                    <p>الحالة: <span class="status ${req.status}">${Utils.formatStatus(req.status)}</span></p>
-                    <p><i class="ri-calendar-line"></i> ${req.req_date || "-"}</p>
-                    <button class="btn btn-primary" onclick="openDetails(${req.request_id})">
-                        <i class="ri-eye-line"></i> عرض التفاصيل
-                    </button>
-                </div>
-            `).join("");
+            allRequests = result.data || [];
+            renderRequests();
         } catch (err) {
             Utils.showError(container);
         }
     }
 
+    function renderRequests() {
+        const container = document.getElementById("requestsContainer");
+
+        if (allRequests.length === 0) {
+            Utils.showEmpty(container, "لا توجد طلبات بعد", "ri-file-list-3-line");
+            return;
+        }
+
+        container.innerHTML = allRequests.map(req => `
+            <div class="request-card">
+                <h3><i class="ri-file-text-line"></i> ${req.service_name || "طلب"}</h3>
+                <p>رقم التتبع: <strong>${req.tracking_no || req.request_id}</strong></p>
+                <p>الحالة: <span class="status ${req.status}">${Utils.formatStatus(req.status)}</span></p>
+                <p><i class="ri-calendar-line"></i> ${req.req_date || "-"}</p>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="openDetails(${req.request_id})">
+                        <i class="ri-eye-line"></i> عرض التفاصيل
+                    </button>
+                    ${req.status === "pending" ? `
+                        <button class="btn btn-danger" onclick="cancelRequest(${req.request_id})">
+                            <i class="ri-close-circle-line"></i> إلغاء الطلب
+                        </button>
+                    ` : ""}
+                </div>
+            </div>
+        `).join("");
+    }
+
     function openDetails(id) {
         window.location.href = `request-details.html?id=${id}`;
+    }
+
+    async function cancelRequest(requestId) {
+        if (!confirm("هل أنت متأكد من إلغاء هذا الطلب؟ لا يمكن التراجع عن هذه الخطوة.")) return;
+
+        const user = Auth.getUser();
+
+        try {
+            const result = await API.cancelRequest(requestId, user.user_id);
+
+            if (result.status === 200) {
+                const req = allRequests.find(r => r.request_id == requestId);
+                if (req) req.status = "cancelled";
+                renderRequests();
+                alert("تم إلغاء الطلب بنجاح");
+            } else {
+                alert(result.message || "فشل إلغاء الطلب");
+            }
+        } catch (err) {
+            alert(err.message || "فشل الاتصال بالسيرفر");
+        }
     }
     </script>
 </body>

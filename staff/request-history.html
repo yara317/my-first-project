@@ -15,20 +15,21 @@
         <div id="app-header"></div>
         <main class="app-content">
             <div class="content-card">
-                <h3 class="card-title"><i class="ri-history-line"></i> الطلبات المعالجة</h3>
+                <h3 class="card-title"><i class="ri-history-line"></i> سجل المعالجة (Audit Trail)</h3>
                 <div class="table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>رقم الطلب</th>
                                 <th>الخدمة</th>
-                                <th>الحالة</th>
+                                <th>تغيير الحالة</th>
+                                <th>ملاحظات</th>
                                 <th>التاريخ</th>
                                 <th>إجراء</th>
                             </tr>
                         </thead>
                         <tbody id="historyTable">
-                            <tr><td colspan="5" class="table-state">جاري التحميل...</td></tr>
+                            <tr><td colspan="6" class="table-state">جاري التحميل...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -58,32 +59,44 @@
 
     async function loadHistory() {
         const tbody = document.getElementById("historyTable");
-        Utils.renderTableLoading(tbody, 5);
+        Utils.renderTableLoading(tbody, 6);
 
         try {
-            const result = await API.getAllRequests();
-            const history = (result.data || []).filter(r =>
-                r.status === "approved" || r.status === "rejected"
-            );
+            const [logsRes, requestsRes] = await Promise.all([
+                API.getLogs(),
+                API.getAllRequests()
+            ]);
 
-            if (history.length === 0) {
-                Utils.renderTableEmpty(tbody, 5, "لا يوجد سجل بعد");
+            const logs = logsRes.data || [];
+            const requestsById = {};
+            (requestsRes.data || []).forEach(r => { requestsById[r.request_id] = r; });
+
+            if (logs.length === 0) {
+                Utils.renderTableEmpty(tbody, 6, "لا يوجد سجل بعد");
                 return;
             }
 
-            tbody.innerHTML = history.map(req => `
+            tbody.innerHTML = logs.map(log => {
+                const req = requestsById[log.request_id] || {};
+                return `
                 <tr>
-                    <td>${req.tracking_no || req.request_id || "-"}</td>
+                    <td>${req.tracking_no || log.request_id}</td>
                     <td>${req.service_name || "-"}</td>
-                    <td><span class="status ${req.status}">${Utils.formatStatus(req.status)}</span></td>
-                    <td>${req.req_date || "-"}</td>
+                    <td>
+                        <span class="status ${log.old_status}">${Utils.formatStatus(log.old_status)}</span>
+                        <i class="ri-arrow-left-line"></i>
+                        <span class="status ${log.new_status}">${Utils.formatStatus(log.new_status)}</span>
+                    </td>
+                    <td>${log.notes || "-"}</td>
+                    <td>${log.log_date || "-"}</td>
                     <td class="table-actions">
-                        <a href="review-request.html?id=${req.request_id}" class="btn btn-outline">عرض</a>
+                        <a href="review-request.html?id=${log.request_id}" class="btn btn-outline">عرض</a>
                     </td>
                 </tr>
-            `).join("");
+            `;
+            }).join("");
         } catch (err) {
-            Utils.renderTableError(tbody, 5);
+            Utils.renderTableError(tbody, 6);
         }
     }
     </script>
